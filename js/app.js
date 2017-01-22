@@ -14,27 +14,27 @@ import { HomeQueries, prepareHomeParams } from './routes/HomeRoute';
 
 const options = {};
 if (localStorage.scapholdAuthToken) {
-  options.headers = {
-    Authorization: 'Bearer ' + localStorage.scapholdAuthToken
-  }
+    options.headers = {
+        Authorization: 'Bearer ' + localStorage.scapholdAuthToken
+    }
 }
 
 Relay.injectNetworkLayer(
-  new Relay.DefaultNetworkLayer(config.scapholdUrl, options)
+    new Relay.DefaultNetworkLayer(config.scapholdUrl, options)
 );
 
 ReactDOM.render(
-  <Router
-    history={hashHistory}
-    render={applyRouterMiddleware(useRelay)}
-    routes={routes}
-    environment={Relay.Store}
-  >
-    <Route path="/" component={App} />
-    <Route path="/home" component={Home} />
-    <Route path="/graphiql" component={GraphiQLModule} />
-  </Router>,
-  document.getElementById('root')
+    <Router
+        history={hashHistory}
+        render={applyRouterMiddleware(useRelay)}
+        routes={routes}
+        environment={Relay.Store}
+    >
+        <Route path="/" component={App} />
+        <Route path="/home" component={Home} />
+        <Route path="/graphiql" component={GraphiQLModule} />
+    </Router>,
+    document.getElementById('root')
 );
 
 /* Add queries={HomeQueries} prepareParams={prepareHomeParams} as attributes to the 'home' route to make queries defined in /routes/HomeRoute.js */

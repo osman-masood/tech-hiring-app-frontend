@@ -5,7 +5,7 @@
  */
 
 const config = {
-	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/react-relay-starter-kit',
-}
+	scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/padawan-hire',
+};
 
 module.exports = config;

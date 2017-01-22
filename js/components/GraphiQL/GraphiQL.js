@@ -7,36 +7,36 @@ import Header from './../App/Header';
 import LoggedInHeader from './../Home/Header';
 
 function graphQLFetcher(graphQLParams) {
-  return fetch(config.scapholdUrl, {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.scapholdAuthToken}`
-    },
-    body: JSON.stringify(graphQLParams),
-  }).then(response => response.json());
+    return fetch(config.scapholdUrl, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.scapholdAuthToken}`
+        },
+        body: JSON.stringify(graphQLParams),
+    }).then(response => response.json());
 }
 
 class GraphiQLModule extends React.Component {
-  render() {
-    let header;
-    if (!localStorage.scapholdAuthToken) {
-      header = <Header />;
-    }
-    else {
-      header = <LoggedInHeader />;
-    }
+    render() {
+        let header;
+        if (!localStorage.scapholdAuthToken) {
+            header = <Header />;
+        }
+        else {
+            header = <LoggedInHeader />;
+        }
 
-    return (
-      <span>
+        return (
+            <span>
         {header}
-        <GraphiQL fetcher={graphQLFetcher} />
+              <GraphiQL fetcher={graphQLFetcher} />
       </span>
-    )
-  }
+        )
+    }
 }
 
 export default Relay.createContainer(GraphiQLModule, {
-  initialVariables: {},
-  fragments: {}
+    initialVariables: {},
+    fragments: {}
 });

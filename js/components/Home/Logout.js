@@ -5,24 +5,24 @@ import { NavItem } from 'react-bootstrap';
 
 class Logout extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.logoutUser = this.logoutUser.bind(this);
-  }
+    constructor(props) {
+        super(props);
+        this.logoutUser = this.logoutUser.bind(this);
+    }
 
-  logoutUser() {
-    localStorage.clear();
-    hashHistory.push('/');
-  }
+    logoutUser() {
+        localStorage.clear();
+        hashHistory.push('/');
+    }
 
-  render() {
-    return (
-      <NavItem onClick={this.logoutUser}>Logout</NavItem>
-    );
-  }
+    render() {
+        return (
+            <NavItem onClick={this.logoutUser}>Logout</NavItem>
+        );
+    }
 }
 
 export default Relay.createContainer(Logout, {
-  fragments: {
-  }
+    fragments: {
+    }
 });

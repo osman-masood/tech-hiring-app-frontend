@@ -6,21 +6,22 @@ import Header from './Header';
 import Body from './Body';
 
 class Home extends React.Component {
-  render() {
-    if (!localStorage.scapholdAuthToken) {
-      hashHistory.push('/');
-    }
+    //noinspection JSMethodCanBeStatic
+    render() {
+        if (!localStorage.scapholdAuthToken) {
+            hashHistory.push('/');
+        }
 
-    return (
-      <div>
-        <Header />
-        <Body />
-      </div>
-    );
-  }
+        return (
+            <div>
+                <Header />
+                <Body />
+            </div>
+        );
+    }
 }
 
 export default Relay.createContainer(Home, {
-  initialVariables: {},
-  fragments: {}
+    initialVariables: {},
+    fragments: {}
 });

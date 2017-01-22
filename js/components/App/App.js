@@ -8,28 +8,30 @@ import Description from './Description';
 import Footer from './Footer';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillMount() {
-    if (localStorage.scapholdAuthToken) {
-      hashHistory.push('/home');
+    constructor(props) {
+        super(props);
     }
-  }
 
-  render() {
-    return (
-      <div>
-        <Header />
-        <Hero />
-        <Description />
-        <Footer />
-      </div>
-    );
-  }
+    //noinspection JSMethodCanBeStatic
+    componentWillMount() {
+        if (localStorage.scapholdAuthToken) {
+            hashHistory.push('/home');
+        }
+    }
+
+    //noinspection JSMethodCanBeStatic
+    render() {
+        return (
+            <div>
+                <Header />
+                <Hero />
+                <Description />
+                <Footer />
+            </div>
+        );
+    }
 }
 
 export default Relay.createContainer(App, {
-  fragments: {}
+    fragments: {}
 });
