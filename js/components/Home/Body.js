@@ -37,7 +37,6 @@ Requirements
 const highchartsConfig = {
     chart: {
         polar: true,
-        width: 170,
         height: 150,
         backgroundColor: '#f5f5f5',
         plotBackgroundColor: '#f5f5f5',
@@ -125,6 +124,7 @@ class Body extends React.Component {
         );
     }
 
+    //noinspection JSMethodCanBeStatic
     renderCandidateRow(candidateInfoObj) {
         return <Row key={candidateInfoObj.id} className="well">
             <Col sm={2}>
@@ -203,25 +203,7 @@ function createJobWithDescriptionAndUserId(description, userId) {
 }
 
 export default Relay.createContainer(Body, {
-    fragments: {
-//         viewer: () => Relay.QL`
-//             fragment on Viewer {
-//                 allCandidateInfos(first: 10) {
-//                     edges {
-//                         node {
-//                             id
-//                             user {
-//                                 id
-//                             }
-//                             githubUsername
-//                             hackerRankUsername
-//                             codeFightsUsername
-//                         }
-//                     }
-//                 }
-//             }
-// `
-    }
+    fragments: { }
 });
 
 
