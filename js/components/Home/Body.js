@@ -4,6 +4,11 @@ import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} fro
 import Description from '../App/Description';
 import FontAwesome from 'react-fontawesome';
 import CreateJobMutation from "../../mutations/CreateJobMutation";
+const ReactHighcharts = require('react-highcharts');
+const HighchartsMore = require('highcharts-more');
+
+HighchartsMore(ReactHighcharts.Highcharts);
+
 
 const TEXTAREA_PLACEHOLDER = `Web Developer
 
@@ -27,6 +32,42 @@ Requirements
 • Knowledge of Object Oriented Programming and web application development
 • Project management skills within a fast-paced work environment
 • BSc degree in Computer Science or relevant field`;
+
+
+const highchartsConfig = {
+    chart: {
+        polar: true,
+        width: 170,
+        height: 150,
+        backgroundColor: '#f5f5f5',
+        plotBackgroundColor: '#f5f5f5',
+        plotBorderColor: '#f5f5f5',
+    },
+    backgroundColor: '#f5f5f5',
+    borderColor: '#f5f5f5',
+    title: null,
+    xAxis: {
+        categories: ['C', 'C++', 'Java', 'Python', 'JS', 'C#', 'iOS', 'React', 'Angular', 'Bootstrap', 'CSS', 'HTML']
+    },
+    series: [{
+        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+    }],
+    credits: {
+        enabled: false
+    },
+    legend: {
+        enabled: false
+    },
+    exporting: {
+        enabled: false
+    },
+    pane: {
+        background: {
+            backgroundColor: '#f5f5f5',
+            borderColor: '#f5f5f5',
+        }
+    }
+};
 
 class Body extends React.Component {
     constructor(props) {
@@ -89,7 +130,7 @@ class Body extends React.Component {
             <Col sm={2}>
                 <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
             </Col>
-            <Col sm={8}>
+            <Col sm={6}>
                 <Row>
                     <Col>
                         <h2>{candidateInfoObj.user.fullName || "Unknown Warrior"}</h2>
@@ -118,8 +159,8 @@ class Body extends React.Component {
                         </Col>
                 </Row>
             </Col>
-            <Col sm={2}>
-                <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
+            <Col sm={4}>
+                <ReactHighcharts config={highchartsConfig} />
             </Col>
         </Row>;
     }
