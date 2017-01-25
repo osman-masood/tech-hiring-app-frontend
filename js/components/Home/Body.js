@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {Row, Col, Button, FormControl, FormGroup, ControlLabel} from 'react-bootstrap';
+import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
 import Description from '../App/Description';
 import FontAwesome from 'react-fontawesome';
 import CreateJobMutation from "../../mutations/CreateJobMutation";
@@ -39,14 +39,15 @@ class Body extends React.Component {
     }
 
     render() {
+        console.log("Body called with props=", this.props);
         const user = JSON.parse(localStorage.getItem('user'));
         const loggedInUser = user ? user.username : '';
+
 
         return (
             <div>
                 <Row style={styles.heading}>
-                    <p>Welcome to PadawanHire!</p>
-                    <p>Paste in a job description to start your search.</p>
+                    <p>Padawan you will find. Paste in your job description you must.</p>
                 </Row>
                 <Row style={styles.subheading}>
                     <Col smOffset={2} sm={8}>
@@ -73,20 +74,60 @@ class Body extends React.Component {
                         </div>
                     </Col>
                 </Row>
-                <Row>
+
+                <Row style={styles.subheading}>
                     <Col smOffset={2} sm={8}>
-                        <div style={styles.subheading.section}>
-                        </div>
+                        { this.props.allCandidateInfos.edges.map(edge => this.renderCandidateRow(edge.node)) }
                     </Col>
                 </Row>
-                {/*<Description />*/}
             </div>
         );
+    }
+
+    renderCandidateRow(candidateInfoObj) {
+        return <Row key={candidateInfoObj.id} className="well">
+            <Col sm={2}>
+                <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
+            </Col>
+            <Col sm={8}>
+                <Row>
+                    <Col>
+                        <h2>{candidateInfoObj.user.fullName || "Unknown Warrior"}</h2>
+                    </Col>
+                </Row>
+                <Row>
+                        <Col sm={3}>
+                            { candidateInfoObj.githubUsername ?
+                            <a target="_blank" href={"https://github.com/" + candidateInfoObj.githubUsername}>Github</a>
+                                : "Github"
+                            }
+                        </Col>
+                        <Col sm={3}>
+                            { candidateInfoObj.hackerRankUsername ?
+                            <a target="_blank"
+                               href={"https://www.hackerrank.com/" + candidateInfoObj.hackerRankUsername}>HackerRank</a>
+                                : "HackerRank"
+                            }
+                        </Col>
+                        <Col sm={3}>
+                            { candidateInfoObj.codeFightsUsername ?
+                            <a target="_blank"
+                               href={"https://codefights.com/profile/" + candidateInfoObj.codeFightsUsername}>CodeFights</a>
+                                : "CodeFight"
+                            }
+                        </Col>
+                </Row>
+            </Col>
+            <Col sm={2}>
+                <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
+            </Col>
+        </Row>;
     }
 
     onClickSearch(userId) {
         this.setState({isSearching: true});
         console.log(`onClickSearch: jobDescription: ${this.state.jobDescription}, userId: ${userId}`);
+
         createJobWithDescriptionAndUserId(this.state.jobDescription, userId).then(data => {
             if (!data.errors) {
                 this.setState({ errors: [], isSearching: false});
@@ -120,9 +161,26 @@ function createJobWithDescriptionAndUserId(description, userId) {
     });
 }
 
-
 export default Relay.createContainer(Body, {
-    fragments: {}
+    fragments: {
+//         viewer: () => Relay.QL`
+//             fragment on Viewer {
+//                 allCandidateInfos(first: 10) {
+//                     edges {
+//                         node {
+//                             id
+//                             user {
+//                                 id
+//                             }
+//                             githubUsername
+//                             hackerRankUsername
+//                             codeFightsUsername
+//                         }
+//                     }
+//                 }
+//             }
+// `
+    }
 });
 
 

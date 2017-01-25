@@ -10,7 +10,7 @@ import config from './../config';
 import App from './components/App/App';
 import Home from './components/Home/Home';
 import GraphiQLModule from './components/GraphiQL/GraphiQL';
-import { HomeQueries, prepareHomeParams } from './routes/HomeRoute';
+import { HomeQueries, prepareHomeParams, BodyQueries} from './routes/HomeRoute';
 
 const options = {};
 if (localStorage.scapholdAuthToken) {
@@ -31,7 +31,7 @@ ReactDOM.render(
         environment={Relay.Store}
     >
         <Route path="/" component={App} />
-        <Route path="/home" component={Home} />
+        <Route path="/home" component={Home} queries={HomeQueries} prepareParams={prepareHomeParams} />
         <Route path="/graphiql" component={GraphiQLModule} />
     </Router>,
     document.getElementById('root')

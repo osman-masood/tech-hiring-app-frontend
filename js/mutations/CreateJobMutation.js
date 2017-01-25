@@ -51,14 +51,15 @@ export default class CreateJobMutation extends Relay.Mutation {
       `]
         }]
     }
-
+    //
     // getOptimisticResponse() {
     //     return {
     //         changedJob: {
-    //             id: this.props.id,
-    //
-    //             userId: this.props.userId,
-    //             description: this.props.description
+    //             id: this.props.input.id,
+    //             user: {
+    //                 id: this.props.input.user.id
+    //             },
+    //             description: this.props.input.description
     //         }
     //     }
     // }

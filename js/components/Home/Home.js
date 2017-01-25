@@ -6,8 +6,15 @@ import Header from './Header';
 import Body from './Body';
 
 class Home extends React.Component {
+    //noinspection JSUnusedGlobalSymbols
+    static propTypes = {
+        viewer: React.PropTypes.object.isRequired,
+        relay: React.PropTypes.object.isRequired,
+    };
+
     //noinspection JSMethodCanBeStatic
     render() {
+        console.log("Home.render() called with props", this.props);
         if (!localStorage.scapholdAuthToken) {
             hashHistory.push('/');
         }
@@ -15,7 +22,7 @@ class Home extends React.Component {
         return (
             <div>
                 <Header />
-                <Body />
+                <Body allCandidateInfos={this.props.viewer.allCandidateInfos}/>
             </div>
         );
     }
@@ -23,5 +30,24 @@ class Home extends React.Component {
 
 export default Relay.createContainer(Home, {
     initialVariables: {},
-    fragments: {}
-});
+    fragments: {
+        viewer: () => Relay.QL`
+            fragment on Viewer {
+                allCandidateInfos(first: 10) {
+                    edges {
+                        node {
+                            id
+                            user {
+                                id
+                                fullName
+                                thumbnailUrl
+                            }
+                            githubUsername
+                            hackerRankUsername
+                            codeFightsUsername
+                        }
+                    }
+                }
+            }
+`
+}});

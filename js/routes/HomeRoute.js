@@ -15,7 +15,16 @@ export const HomeQueries = {
     // 		}
     // 	`
     // }
+
+    viewer: () => {
+        return Relay.QL`
+            query {
+                viewer
+            }
+`
+    }
 };
+
 
 export function prepareHomeParams(params, {}) {
     return {
