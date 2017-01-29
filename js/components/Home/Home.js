@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Button} from 'react-bootstrap';
-import {hashHistory} from 'react-router';
+import {browserHistory} from 'react-router';
 import Header from './Header';
 import Body from './Body';
 
@@ -16,7 +16,7 @@ class Home extends React.Component {
     render() {
         console.log("Home.render() called with props", this.props);
         if (!localStorage.scapholdAuthToken) {
-            hashHistory.push('/');
+            browserHistory.push('/');
         }
 
         return (

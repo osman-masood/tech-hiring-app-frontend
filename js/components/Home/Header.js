@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {hashHistory} from 'react-router';
+import {browserHistory} from 'react-router';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
 import Logout from './Logout';
 
@@ -13,12 +13,12 @@ class Header extends React.Component {
 
     //noinspection JSMethodCanBeStatic
     goToGraphiQL() {
-        hashHistory.push('/graphiql');
+        browserHistory.push('/graphiql');
     }
 
     //noinspection JSMethodCanBeStatic
     goHome() {
-        hashHistory.push('/');
+        browserHistory.push('/');
     }
 
     //noinspection JSMethodCanBeStatic

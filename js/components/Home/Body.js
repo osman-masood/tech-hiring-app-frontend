@@ -1,5 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
+import {Link} from 'react-router';
 import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
 import Description from '../App/Description';
 import FontAwesome from 'react-fontawesome';
@@ -128,35 +129,39 @@ class Body extends React.Component {
     renderCandidateRow(candidateInfoObj) {
         return <Row key={candidateInfoObj.id} className="well">
             <Col sm={2}>
-                <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
+                <Link to={`/profile/${candidateInfoObj.user.id}`}>
+                    <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
+                </Link>
             </Col>
             <Col sm={6}>
                 <Row>
-                    <Col>
-                        <h2>{candidateInfoObj.user.fullName || "Unknown Warrior"}</h2>
-                    </Col>
+                    <Link to={`/profile/${candidateInfoObj.user.id}`}>
+                        <Col>
+                            <h2>{candidateInfoObj.user.fullName || "Unknown Warrior"}</h2>
+                        </Col>
+                    </Link>
                 </Row>
                 <Row>
-                        <Col sm={3}>
-                            { candidateInfoObj.githubUsername ?
+                    <Col sm={3}>
+                        { candidateInfoObj.githubUsername ?
                             <a target="_blank" href={"https://github.com/" + candidateInfoObj.githubUsername}>Github</a>
-                                : "Github"
-                            }
-                        </Col>
-                        <Col sm={3}>
-                            { candidateInfoObj.hackerRankUsername ?
+                            : "Github"
+                        }
+                    </Col>
+                    <Col sm={3}>
+                        { candidateInfoObj.hackerRankUsername ?
                             <a target="_blank"
                                href={"https://www.hackerrank.com/" + candidateInfoObj.hackerRankUsername}>HackerRank</a>
-                                : "HackerRank"
-                            }
-                        </Col>
-                        <Col sm={3}>
-                            { candidateInfoObj.codeFightsUsername ?
+                            : "HackerRank"
+                        }
+                    </Col>
+                    <Col sm={3}>
+                        { candidateInfoObj.codeFightsUsername ?
                             <a target="_blank"
                                href={"https://codefights.com/profile/" + candidateInfoObj.codeFightsUsername}>CodeFights</a>
-                                : "CodeFight"
-                            }
-                        </Col>
+                            : "CodeFight"
+                        }
+                    </Col>
                 </Row>
             </Col>
             <Col sm={4}>

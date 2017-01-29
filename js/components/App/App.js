@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Row, Col, Button, Jumbotron} from 'react-bootstrap';
-import {hashHistory} from 'react-router';
+import {browserHistory} from 'react-router';
 import Header from './Header';
 import Hero from './Hero';
 import Description from './Description';
@@ -15,7 +15,7 @@ class App extends React.Component {
     //noinspection JSMethodCanBeStatic
     componentWillMount() {
         if (localStorage.scapholdAuthToken) {
-            hashHistory.push('/home');
+            browserHistory.push('/home');
         }
     }
 

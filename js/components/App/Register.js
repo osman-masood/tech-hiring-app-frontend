@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import { hashHistory } from 'react-router';
+import { browserHistory } from 'react-router';
 import { Button, Modal, OverlayTrigger, NavItem, Form, FormControl, FormGroup, Row, Col, ControlLabel, Alert } from 'react-bootstrap';
 import * as Auth from './../../auth/Auth';
 import config from './../../../config';
@@ -59,7 +59,7 @@ class Register extends React.Component {
                     localStorage.setItem('scapholdAuthToken', data.loginUser.token);
                     localStorage.setItem('user', JSON.stringify(data.loginUser.user));
                     this.setState({ errors: [] });
-                    hashHistory.push('/home');
+                    browserHistory.push('/home');
                 } else {
                     this.setState({ errors: data.errors });
                 }
