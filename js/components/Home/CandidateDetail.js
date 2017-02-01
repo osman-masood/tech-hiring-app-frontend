@@ -13,6 +13,7 @@ const ReactHighcharts = require('react-highcharts');
 const HighchartsMore = require('highcharts-more');
 const reactjsAdminlte = require('adminlte-reactjs');
 const InfoTile = reactjsAdminlte.InfoTile;
+const Box = reactjsAdminlte.Box;
 const ProgressBar = reactjsAdminlte.ProgressBar;
 import moment from 'moment';
 
@@ -51,41 +52,44 @@ class CandidateDetail extends React.Component {
                     </section>
                     <section className="content">
                         <Row>
-                            {/*<Col md={3} sm={6} xs={9}>*/}
-                                <InfoTile
-                                    width={3}
-                                    content=''
-                                    icon='fa-envelope-o'
-                                    stats='1,410'
-                                    subject='Repos'
-                                    theme='bg-aqua'>
+                            <InfoTile
+                                width={3}
+                                content=''
+                                icon='fa-envelope-o'
+                                stats='1,410'
+                                subject='Repos'
+                                theme='bg-aqua'>
 
-                                    <ProgressBar percent={10} description='50% Increase in 30 Days' color='white' />
-                                </InfoTile>
-                            {/*</Col>*/}
-                            {/*<Col md={3} sm={6} xs={9}>*/}
-                                <InfoTile width={3} content = '' icon = 'fa-thumbs-o-up' stats = '41,410' subject = 'Likes' theme = 'bg-green' >
-                                    <ProgressBar percent={50} description = '50% Increase in 30 Days' color = 'white' />
-                                </InfoTile>
-                            {/*</Col>*/}
-                            {/*<Col md={3} sm={6} xs={9}>*/}
-                                <InfoTile
-                                    width={3}
-                                    content=''
-                                    icon='fa-envelope-o'
-                                    stats='1,410'
-                                    subject='Messages'
-                                    theme='bg-aqua'/>
-                            {/*</Col>*/}
-                            {/*<Col md={3} sm={6} xs={9}>*/}
-                                <InfoTile
-                                    width={3}
-                                    content=''
-                                    icon='fa-envelope-o'
-                                    stats='1,410'
-                                    subject='Messages'
-                                    theme='bg-aqua'/>
-                            {/*</Col>*/}
+                                {/*<ProgressBar percent={10} description='50% Increase in 30 Days' color='white' />*/}
+                            </InfoTile>
+                            <InfoTile width={3} content = '' icon = 'fa-thumbs-o-up' stats = '41,410' subject = 'Likes' theme = 'bg-green' >
+                                {/*<ProgressBar percent={50} description = '50% Increase in 30 Days' color = 'white' />*/}
+                            </InfoTile>
+                            <InfoTile
+                                width={3}
+                                content=''
+                                icon='fa-envelope-o'
+                                stats='1,410'
+                                subject='Messages'
+                                theme='bg-aqua'/>
+                            <InfoTile
+                                width={3}
+                                content=''
+                                icon='fa-envelope-o'
+                                stats='1,410'
+                                subject='Messages'
+                                theme='bg-aqua'/>
+                        </Row>
+                        <Row>
+                            <Box
+                                width = {3}
+    border={true}
+    content = 'The body of the box'
+    theme = 'box-default'
+    title = 'Expandable'
+    collapsed={true}
+    boxTools = {['expand']}
+/>
                         </Row>
                     </section>
                 </div>
