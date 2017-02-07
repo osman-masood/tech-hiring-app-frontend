@@ -34,6 +34,7 @@ export function login(username, password) {
                 resolve(data);
             },
             onFailure: (transaction) => {
+                console.log("Auth.js: login: onFailure called with transaction", transaction);
                 reject(transaction.getError().message);
             }
         });

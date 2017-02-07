@@ -43,7 +43,10 @@ export default Relay.createContainer(Home, {
                                 thumbnailUrl
                             }
                             githubUsername
+                            githubRepoInfos
+                            githubEventInfos
                             hackerRankUsername
+                            hackerRankInfo
                             codeFightsUsername
                         }
                     }

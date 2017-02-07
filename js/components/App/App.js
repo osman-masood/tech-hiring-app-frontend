@@ -4,7 +4,6 @@ import {Row, Col, Button, Jumbotron} from 'react-bootstrap';
 import {browserHistory} from 'react-router';
 import Header from './Header';
 import Hero from './Hero';
-import Description from './Description';
 import Footer from './Footer';
 
 class App extends React.Component {
@@ -25,7 +24,6 @@ class App extends React.Component {
             <div>
                 <Header />
                 <Hero />
-                <Description />
                 <Footer />
             </div>
         );

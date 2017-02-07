@@ -2,7 +2,6 @@ import React from 'react';
 import Relay from 'react-relay';
 import {Link} from 'react-router';
 import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
-import Description from '../App/Description';
 import FontAwesome from 'react-fontawesome';
 import CreateJobMutation from "../../mutations/CreateJobMutation";
 const ReactHighcharts = require('react-highcharts');
@@ -83,7 +82,6 @@ class Body extends React.Component {
         console.log("Body called with props=", this.props);
         const user = JSON.parse(localStorage.getItem('user'));
         const loggedInUser = user ? user.username : '';
-
 
         return (
             <div>

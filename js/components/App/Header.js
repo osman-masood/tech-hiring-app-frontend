@@ -23,17 +23,17 @@ class Header extends React.Component {
     render() {
         return (
             <Navbar style={styles.navbar}>
-              <Navbar.Header>
-                <Navbar.Brand>
-                  <a href="/">Scaphold</a>
-                </Navbar.Brand>
-              </Navbar.Header>
-              <Nav pullRight={true}>
-                <NavItem onClick={this.goHome}>Home</NavItem>
-                {/*<NavItem onClick={this.goToGraphiQL}>GraphiQL</NavItem>*/}
-                <Login />
-                <Register />
-              </Nav>
+                <Navbar.Header>
+                    <Navbar.Brand>
+                        <a href="/">PadawanHire</a>
+                    </Navbar.Brand>
+                </Navbar.Header>
+                <Nav pullRight={true}>
+                    <NavItem onClick={this.goHome}>Home</NavItem>
+                    {/*<NavItem onClick={this.goToGraphiQL}>GraphiQL</NavItem>*/}
+                    <Login />
+                    <Register />
+                </Nav>
             </Navbar>
         );
     }

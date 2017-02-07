@@ -8,14 +8,72 @@ import React from 'react';
 import Relay from 'react-relay';
 import {browserHistory} from 'react-router';
 import Header from './Header';
-import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
+import {Row, Col, Button, FormControl, ButtonToolbar, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
 const ReactHighcharts = require('react-highcharts');
 const HighchartsMore = require('highcharts-more');
+HighchartsMore(ReactHighcharts.Highcharts);
 const reactjsAdminlte = require('adminlte-reactjs');
 const InfoTile = reactjsAdminlte.InfoTile;
 // const Box = reactjsAdminlte.CustomBox;
 const ProgressBar = reactjsAdminlte.ProgressBar;
+const StatTile = reactjsAdminlte.StatTile;
 import moment from 'moment';
+
+const getGithubReposUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}?tab=repositories` : null;
+const getGithubOverviewUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}` : null;
+const getHackerRankUrl = (hackerRankUsername) => hackerRankUsername ? `https://www.hackerrank.com/${hackerRankUsername}` : null;
+
+const spiderGraphConfig = {
+
+    chart: {
+        polar: true,
+        type: 'line'
+    },
+
+    title: {
+        text: 'Budget vs spending',
+        x: -80
+    },
+
+    pane: {
+        size: '80%'
+    },
+
+    xAxis: {
+        categories: ['Sales', 'Marketing', 'Development', 'Customer Support',
+            'Information Technology', 'Administration'],
+        tickmarkPlacement: 'on',
+        lineWidth: 0
+    },
+
+    yAxis: {
+        gridLineInterpolation: 'polygon',
+        lineWidth: 0,
+        min: 0
+    },
+
+    tooltip: {
+        shared: true,
+        pointFormat: '<span style="color:{series.color}">{series.name}: <b>${point.y:,.0f}</b><br/>'
+    },
+
+    legend: {
+        align: 'right',
+        verticalAlign: 'top',
+        y: 70,
+        layout: 'vertical'
+    },
+
+    series: [{
+        name: 'Allocated Budget',
+        data: [43000, 19000, 60000, 35000, 17000, 10000],
+        pointPlacement: 'on'
+    }, {
+        name: 'Actual Spending',
+        data: [50000, 39000, 42000, 31000, 26000, 14000],
+        pointPlacement: 'on'
+    }]
+};
 
 class CandidateDetail extends React.Component {
     //noinspection JSUnusedGlobalSymbols
@@ -39,6 +97,30 @@ class CandidateDetail extends React.Component {
 
         const joinedCurrentYear = new Date(this.props.user.createdAt).getUTCFullYear() === new Date().getUTCFullYear();
         const joinedDate = moment(this.props.user.createdAt).format('MMMM D' + (joinedCurrentYear ? '' : ', YYYY'));
+        const hackerRankInfo = JSON.parse(this.props.user.hackerRankInfo || "{}");
+        const hackerRankEventCount = hackerRankInfo.profile ? hackerRankInfo.profile.model.event_count : 'N/A';
+
+        // Set HackerRank scores
+        let hackerRankGeneralScorePercentile = 0;
+        let hackerRankPercentileDescription = "No HackerRank profile";
+        if (hackerRankInfo.scoresElo) {
+            hackerRankGeneralScorePercentile = hackerRankInfo.scoresElo.filter(scoreElo => scoreElo.slug === "general").map(scoreElo => scoreElo.contest.percentile);
+            hackerRankGeneralScorePercentile = parseInt(hackerRankGeneralScorePercentile.length ? hackerRankGeneralScorePercentile[0] : 0);
+            hackerRankPercentileDescription = hackerRankGeneralScorePercentile ? hackerRankGeneralScorePercentile + ' percentile' : "General percentile N/A";
+        }
+
+        // Github information
+        const numGithubRepos = this.props.user.candidateInfo.githubRepoInfos ? this.props.user.candidateInfo.githubRepoInfos.length : 'N/A';
+        const githubRepoProgressBarDescription = this.props.user.candidateInfo.githubRepoInfos ? (numGithubRepos + " repos") : "No Github profile";
+        const githubEventLength = this.props.user.candidateInfo.githubEventInfos ? this.props.user.candidateInfo.githubEventInfos.length : "N/A";
+        const githubEventProgressBarDescription = this.props.user.candidateInfo.githubEventInfos ? this.props.user.candidateInfo.githubEventInfos.length + " activities" : "No Github activities";
+
+        // TODO ideas for charts: http://www.highcharts.com/demo/polar (area graphs for GH + CF + etc, with particular language/skill for each axis)
+        // OR: http://www.highcharts.com/demo/polar-spider
+        // Also, graph of activity over time for each service: http://www.highcharts.com/demo/line-basic
+
+        const isLiked = true;
+        const isHidden = true;
 
         return (
             <div>
@@ -47,45 +129,70 @@ class CandidateDetail extends React.Component {
                 <div className="content-wrapper" style={{marginLeft: 0}}>
                     <section className="content-header">
                         <h1>
-                            <span>{this.props.user.fullName || this.props.user.username}</span><small>Joined {joinedDate}</small>
+                            <span>{this.props.user.fullName || this.props.user.username}</span>
+                            <small>Joined {joinedDate}</small>
+                                <a className={"btn btn-app" + (isLiked ? " bg-green" : "")} style={styles.topButtons}>
+                                    <i className="fa fa-heart-o" />
+                                    { isLiked ? "Liked": "Like" }
+                                </a>
+                                <a className={"btn btn-app" + (isLiked ? " bg-gray" : "")} style={styles.topButtons}>
+                                    <i className="fa fa-archive"/>
+                                    {isHidden ? "Hidden" : "Don't show"}
+                                </a>
+                                <a className="btn btn-app" style={styles.topButtons}>
+                                    <i className="fa fa-phone"/> Call Padawan
+                                </a>
+                                <a className="btn btn-app" style={styles.topButtons}>
+                                    <i className="fa fa-calendar-plus-o"/> Schedule Call
+                                </a> {/* fa-calendar-check-o is for "Call Scheduled */}
+
+                                {/*<Button bsStyle="primary" bsSize="large" style={styles.topButtons}>Like</Button>*/}
+                                {/*<Button bsSize="large" style={styles.topButtons}>{ "Don't Show" }</Button>*/}
+                                {/*<Button bsSize="large" style={styles.topButtons}>Call Padawan</Button>*/}
+                                {/*<Button bsSize="large" style={styles.topButtons}>Schedule Call</Button>*/}
                         </h1>
                     </section>
                     <section className="content">
                         <Row>
-                            <InfoTile
+                            <StatTile
                                 width={3}
-                                content=''
-                                icon='fa-envelope-o'
-                                stats='1,410'
-                                subject='Repos'
+                                icon='fa-bullseye'
+                                stats={ "20" }
+                                subject='Relevancy Score'
                                 theme='bg-aqua'>
+                            </StatTile>
+                            <StatTile
+                                width={3}
+                                icon='fa-university'
+                                stats={ "3.5" }
+                                subject='GPA'
+                                theme='bg-green'>
 
-                                {/*<ProgressBar percent={10} description='50% Increase in 30 Days' color='white' />*/}
-                            </InfoTile>
-                            <InfoTile width={3} content = '' icon = 'fa-thumbs-o-up' stats = '41,410' subject = 'Likes' theme = 'bg-green' >
-                                {/*<ProgressBar percent={50} description = '50% Increase in 30 Days' color = 'white' />*/}
-                            </InfoTile>
-                            <InfoTile
+                                {/*<ProgressBar percent={githubEventLength / 100} description={githubEventProgressBarDescription} color='white' />*/}
+                            </StatTile>
+                            <StatTile
                                 width={3}
-                                content=''
-                                icon='fa-envelope-o'
-                                stats='1,410'
-                                subject='Messages'
-                                theme='bg-aqua'/>
-                            <InfoTile
+                                icon='fa-bookmark'
+                                stats={ "0" }
+                                subject='Score TBD'
+                                theme='bg-green'>
+
+                            </StatTile>
+                            <StatTile
                                 width={3}
-                                content=''
-                                icon='fa-envelope-o'
-                                stats='1,410'
-                                subject='Messages'
-                                theme='bg-aqua'/>
+                                icon='fa-bolt'
+                                stats={ "0" }
+                                subject='Score TBD'
+                                theme='bg-green'>
+
+                            </StatTile>
                         </Row>
 
                         <Row>
-                            <Col md={12}>
+                            <Col md={6}>
                                 <div className="box">
                                     <div className="box-header with-border">
-                                        <h3 className="box-title">Monthly Recap Report</h3>
+                                        <h3 className="box-title">Relevancy Graph</h3>
 
                                         <div className="box-tools pull-right">
                                             <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"/>
@@ -106,51 +213,13 @@ class CandidateDetail extends React.Component {
                                     </div>
                                     <div className="box-body" style={{display: "block"}}>
                                         <div className="row">
-                                            <div className="col-md-8">
-                                                <p className="text-center">
-                                                    <strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>
-                                                </p>
+                                            <div className="col-md-12">
+                                                {/*<p className="text-center">*/}
+                                                    {/*<strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>*/}
+                                                {/*</p>*/}
 
                                                 <div className="chart">
-                                                    {/*<canvas id="salesChart" style="height: 141px; width: 505px;" height="282" width="1010"></canvas>*/}
-                                                </div>
-                                            </div>
-                                            <div className="col-md-4">
-                                                <p className="text-center">
-                                                    <strong>Goal Completion</strong>
-                                                </p>
-
-                                                <div className="progress-group">
-                                                    <span className="progress-text">Add Products to Cart</span>
-                                                    <span className="progress-number"><b>160</b>/200</span>
-
-                                                    <div className="progress sm">
-                                                        <div className="progress-bar progress-bar-aqua" style={{width: "80%"}}></div>
-                                                    </div>
-                                                </div>
-                                                <div className="progress-group">
-                                                    <span className="progress-text">Complete Purchase</span>
-                                                    <span className="progress-number"><b>310</b>/400</span>
-
-                                                    <div className="progress sm">
-                                                        <div className="progress-bar progress-bar-red" style={{width: "80%"}}></div>
-                                                    </div>
-                                                </div>
-                                                <div className="progress-group">
-                                                    <span className="progress-text">Visit Premium Page</span>
-                                                    <span className="progress-number"><b>480</b>/800</span>
-
-                                                    <div className="progress sm">
-                                                        <div className="progress-bar progress-bar-green" style={{width: "80%"}}></div>
-                                                    </div>
-                                                </div>
-                                                <div className="progress-group">
-                                                    <span className="progress-text">Send Inquiries</span>
-                                                    <span className="progress-number"><b>250</b>/500</span>
-
-                                                    <div className="progress sm">
-                                                        <div className="progress-bar progress-bar-yellow" style={{width: "80%"}}></div>
-                                                    </div>
+                                                    <ReactHighcharts config={spiderGraphConfig} />
                                                 </div>
                                             </div>
                                         </div>
@@ -283,7 +352,7 @@ class CandidateDetail extends React.Component {
                                                             <span className="direct-chat-timestamp pull-right">23 Jan 2:00 pm</span>
                                                         </div>
 
-                                                        <img className="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image" />
+                                                        <img className="direct-chat-img" src="http://lorempixel.com/128/128/" alt="message user image" />
                                                         <div className="direct-chat-text">
                                                             Is this template really for free? That's unbelievable!
                                                         </div>
@@ -298,7 +367,7 @@ class CandidateDetail extends React.Component {
                                                             <span className="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span>
                                                         </div>
 
-                                                        <img className="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image" />
+                                                        <img className="direct-chat-img" src="http://lorempixel.com/128/128/" alt="message user image" />
                                                         <div className="direct-chat-text">
                                                             You better believe it!
                                                         </div>
@@ -313,7 +382,7 @@ class CandidateDetail extends React.Component {
                                                             <span className="direct-chat-timestamp pull-right">23 Jan 5:37 pm</span>
                                                         </div>
 
-                                                        <img className="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image" />
+                                                        <img className="direct-chat-img" src="http://lorempixel.com/128/128/" alt="message user image" />
                                                         <div className="direct-chat-text">
                                                             Working with AdminLTE on a great new app! Wanna join?
                                                         </div>
@@ -328,7 +397,7 @@ class CandidateDetail extends React.Component {
                                                             <span className="direct-chat-timestamp pull-left">23 Jan 6:10 pm</span>
                                                         </div>
 
-                                                        <img className="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image" />
+                                                        <img className="direct-chat-img" src="http://lorempixel.com/128/128/" alt="message user image" />
                                                         <div className="direct-chat-text">
                                                             I would love to.
                                                         </div>
@@ -340,7 +409,7 @@ class CandidateDetail extends React.Component {
                                                     <ul className="contacts-list">
                                                         <li>
                                                             <a href="#">
-                                                                <img className="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Image" />
+                                                                <img className="contacts-list-img" src="http://lorempixel.com/128/128/" alt="User Image" />
 
                                                                 <div className="contacts-list-info">
                                                                     <span className="contacts-list-name">
@@ -355,13 +424,13 @@ class CandidateDetail extends React.Component {
 
                                                         <li>
                                                             <a href="#">
-                                                                <img className="contacts-list-img" src="dist/img/user7-128x128.jpg" alt="User Image" />
+                                                                <img className="contacts-list-img" src="http://lorempixel.com/128/128/" alt="User Image" />
 
                                                                 <div className="contacts-list-info">
-                                <span className="contacts-list-name">
-                                  Sarah Doe
-                                  <small className="contacts-list-date pull-right">2/23/2015</small>
-                                </span>
+                                                                    <span className="contacts-list-name">
+                                                                        Sarah Doe
+                                                                        <small className="contacts-list-date pull-right">2/23/2015</small>
+                                                                    </span>
                                                                     <span className="contacts-list-msg">I will be waiting for...</span>
                                                                 </div>
 
@@ -370,14 +439,14 @@ class CandidateDetail extends React.Component {
 
                                                         <li>
                                                             <a href="#">
-                                                                <img className="contacts-list-img" src="dist/img/user3-128x128.jpg" alt="User Image" />
+                                                                <img className="contacts-list-img" src="http://lorempixel.com/128/128/" alt="User Image" />
 
                                                                 <div className="contacts-list-info">
-                                <span className="contacts-list-name">
-                                  Nadia Jolie
-                                  <small className="contacts-list-date pull-right">2/20/2015</small>
-                                </span>
-                                                                    <span className="contacts-list-msg">I'll call you back at...</span>
+                                                                    <span className="contacts-list-name">
+                                                                        Nadia Jolie
+                                                                        <small className="contacts-list-date pull-right">2/20/2015</small>
+                                                                    </span>
+                                                                    <span className="contacts-list-msg">{"I'll call you back at..."}</span>
                                                                 </div>
 
                                                             </a>
@@ -385,7 +454,7 @@ class CandidateDetail extends React.Component {
 
                                                         <li>
                                                             <a href="#">
-                                                                <img className="contacts-list-img" src="dist/img/user5-128x128.jpg" alt="User Image" />
+                                                                <img className="contacts-list-img" src="http://lorempixel.com/128/128/" alt="User Image" />
 
                                                                 <div className="contacts-list-info">
                                                                     <span className="contacts-list-name">
@@ -400,13 +469,13 @@ class CandidateDetail extends React.Component {
 
                                                         <li>
                                                             <a href="#">
-                                                                <img className="contacts-list-img" src="dist/img/user6-128x128.jpg" alt="User Image" />
+                                                                <img className="contacts-list-img" src="http://lorempixel.com/128/128/" alt="User Image" />
 
                                                                 <div className="contacts-list-info">
-                                <span className="contacts-list-name">
-                                  John K.
-                                  <small className="contacts-list-date pull-right">1/27/2015</small>
-                                </span>
+                                                                    <span className="contacts-list-name">
+                                                                      John K.
+                                                                      <small className="contacts-list-date pull-right">1/27/2015</small>
+                                                                    </span>
                                                                     <span className="contacts-list-msg">Can I take a look at...</span>
                                                                 </div>
 
@@ -415,16 +484,15 @@ class CandidateDetail extends React.Component {
 
                                                         <li>
                                                             <a href="#">
-                                                                <img className="contacts-list-img" src="dist/img/user8-128x128.jpg" alt="User Image" />
+                                                                <img className="contacts-list-img" src="http://lorempixel.com/128/128/" alt="User Image" />
 
                                                                 <div className="contacts-list-info">
-                                <span className="contacts-list-name">
-                                  Kenneth M.
-                                  <small className="contacts-list-date pull-right">1/4/2015</small>
-                                </span>
+                                                                    <span className="contacts-list-name">
+                                                                        Kenneth M.
+                                                                        <small className="contacts-list-date pull-right">1/4/2015</small>
+                                                                    </span>
                                                                     <span className="contacts-list-msg">Never mind I found...</span>
                                                                 </div>
-
                                                             </a>
                                                         </li>
 
@@ -468,42 +536,42 @@ class CandidateDetail extends React.Component {
                                             <div className="box-body no-padding">
                                                 <ul className="users-list clearfix">
                                                     <li>
-                                                        <img src="dist/img/user1-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Alexander Pierce</a>
                                                         <span className="users-list-date">Today</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user8-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Norman</a>
                                                         <span className="users-list-date">Yesterday</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user7-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Jane</a>
                                                         <span className="users-list-date">12 Jan</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user6-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">John</a>
                                                         <span className="users-list-date">12 Jan</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user2-160x160.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/160/160/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Alexander</a>
                                                         <span className="users-list-date">13 Jan</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user5-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Sarah</a>
                                                         <span className="users-list-date">14 Jan</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user4-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Nora</a>
                                                         <span className="users-list-date">15 Jan</span>
                                                     </li>
                                                     <li>
-                                                        <img src="dist/img/user3-128x128.jpg" alt="User Image" />
+                                                        <img src="http://lorempixel.com/128/128/" alt="User Image" />
                                                         <a className="users-list-name" href="#">Nadia</a>
                                                         <span className="users-list-date">15 Jan</span>
                                                     </li>
@@ -763,7 +831,7 @@ class CandidateDetail extends React.Component {
                                         <ul className="products-list product-list-in-box">
                                             <li className="item">
                                                 <div className="product-img">
-                                                    <img src="dist/img/default-50x50.gif" alt="Product Image" />
+                                                    <img src="http://lorempixel.com/50/50/" alt="Product Image" />
                                                 </div>
                                                 <div className="product-info">
                                                     <a href="javascript:void(0)" className="product-title">Samsung TV
@@ -776,7 +844,7 @@ class CandidateDetail extends React.Component {
 
                                             <li className="item">
                                                 <div className="product-img">
-                                                    <img src="dist/img/default-50x50.gif" alt="Product Image" />
+                                                    <img src="http://lorempixel.com/50/50/" alt="Product Image" />
                                                 </div>
                                                 <div className="product-info">
                                                     <a href="javascript:void(0)" className="product-title">Bicycle
@@ -789,7 +857,7 @@ class CandidateDetail extends React.Component {
 
                                             <li className="item">
                                                 <div className="product-img">
-                                                    <img src="dist/img/default-50x50.gif" alt="Product Image" />
+                                                    <img src="http://lorempixel.com/50/50/" alt="Product Image" />
                                                 </div>
                                                 <div className="product-info">
                                                     <a href="javascript:void(0)" className="product-title">Xbox One <span className="label label-danger pull-right">$350</span></a>
@@ -801,7 +869,7 @@ class CandidateDetail extends React.Component {
 
                                             <li className="item">
                                                 <div className="product-img">
-                                                    <img src="dist/img/default-50x50.gif" alt="Product Image" />
+                                                    <img src="http://lorempixel.com/50/50/" alt="Product Image" />
                                                 </div>
                                                 <div className="product-info">
                                                     <a href="javascript:void(0)" className="product-title">PlayStation 4
@@ -845,7 +913,9 @@ export default Relay.createContainer(CandidateDetail, {
                 candidateInfo {
                     githubUsername
                     githubRepoInfos
+                    githubEventInfos
                     hackerRankUsername
+                    hackerRankInfo
                     codeFightsUsername
                     modifiedAt
                     createdAt
@@ -853,3 +923,9 @@ export default Relay.createContainer(CandidateDetail, {
             }
 `
     }});
+
+const styles = {
+    topButtons: {
+        marginLeft: "3%"
+    }
+}

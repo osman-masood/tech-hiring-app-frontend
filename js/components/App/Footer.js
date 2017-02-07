@@ -4,27 +4,27 @@ import {Row, Col} from 'react-bootstrap';
 import FontAwesome from 'react-fontawesome';
 
 class Footer extends React.Component {
-  render() {
-    return (
-      <Row>
-        <Col>
-          <p style={styles.footer}>Made with <FontAwesome name='heart'/> from the Scaphold team</p>
-        </Col>
-      </Row>
-    );
-  }
+    render() {
+        return (
+            <Row>
+                <Col>
+                    <p style={styles.footer}>PadawanHire, Inc. © 2017</p>
+                </Col>
+            </Row>
+        );
+    }
 }
 
 export default Relay.createContainer(Footer, {
-  fragments: {
-  }
+    fragments: {
+    }
 });
 
 const styles = {
-  footer: {
-    textAlign: 'center',
-    paddingTop: 19,
-    color: '#777',
-    borderTop: '1px, solid, #e5e5e5'
-  }
+    footer: {
+        textAlign: 'center',
+        paddingTop: 19,
+        color: '#777',
+        borderTop: '1px, solid, #e5e5e5'
+    }
 };
