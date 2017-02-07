@@ -31,13 +31,13 @@ const spiderGraphConfig = {
     },
 
     title: {
-        text: 'Budget vs spending',
+        text: 'Candidate vs Job Description',
         x: -80
     },
 
-    pane: {
-        size: '80%'
-    },
+    // pane: {
+    //     size: '80%'
+    // },
 
     xAxis: {
         categories: ['Sales', 'Marketing', 'Development', 'Customer Support',
@@ -58,22 +58,118 @@ const spiderGraphConfig = {
     },
 
     legend: {
-        align: 'right',
-        verticalAlign: 'top',
-        y: 70,
-        layout: 'vertical'
+        enabled: false
+    },
+
+    exporting: {
+        enabled: false
     },
 
     series: [{
-        name: 'Allocated Budget',
+        name: 'Candidate Skill',
         data: [43000, 19000, 60000, 35000, 17000, 10000],
         pointPlacement: 'on'
     }, {
-        name: 'Actual Spending',
+        name: 'Job Description',
         data: [50000, 39000, 42000, 31000, 26000, 14000],
         pointPlacement: 'on'
-    }]
+    }],
+
+    credits: {
+        enabled: false
+    }
 };
+
+const highchartsConfig = {
+    chart: {
+        polar: true,
+        height: 150,
+        backgroundColor: '#f5f5f5',
+        plotBackgroundColor: '#f5f5f5',
+        plotBorderColor: '#f5f5f5',
+    },
+    backgroundColor: '#f5f5f5',
+    borderColor: '#f5f5f5',
+    title: null,
+    xAxis: {
+        categories: ['C', 'C++', 'Java', 'Python', 'JS', 'C#', 'iOS', 'React', 'Angular', 'Bootstrap', 'CSS', 'HTML']
+    },
+    series: [{
+        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+    }],
+    credits: {
+        enabled: false
+    },
+    legend: {
+        enabled: false
+    },
+    exporting: {
+        enabled: false
+    },
+    pane: {
+        background: {
+            backgroundColor: '#f5f5f5',
+            borderColor: '#f5f5f5',
+        }
+    }
+};
+
+const skillSetGraphConfig = {
+    chart: {
+        type: 'column'
+    },
+
+    title: {
+        text: 'Total fruit consumtion, grouped by gender'
+    },
+
+    xAxis: {
+        categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+    },
+
+    yAxis: {
+        allowDecimals: false,
+        min: 0,
+        title: {
+            text: 'Number of fruits'
+        }
+    },
+    //
+    // tooltip: {
+    //     formatter: function () {
+    //         return '<b>' + this.x + '</b><br/>' +
+    //             this.series.name + ': ' + this.y + '<br/>' +
+    //             'Total: ' + this.point.stackTotal;
+    //     }
+    // },
+
+    // plotOptions: {
+    //     column: {
+    //         stacking: 'normal'
+    //     }
+    // },
+
+    series: [{
+        name: 'John',
+        data: [5, 3, 4, 7, 2],
+        // stack: 'male'
+    }
+    //     {
+    //     name: 'Joe',
+    //     data: [3, 4, 4, 2, 5],
+    //     // stack: 'male'
+    // }, {
+    //     name: 'Jane',
+    //     data: [2, 5, 6, 2, 1],
+    //     // stack: 'female'
+    // }, {
+    //     name: 'Janet',
+    //     data: [3, 0, 4, 4, 3],
+    //     // stack: 'female'
+    // }
+    ]
+};
+
 
 class CandidateDetail extends React.Component {
     //noinspection JSUnusedGlobalSymbols
@@ -125,7 +221,6 @@ class CandidateDetail extends React.Component {
         return (
             <div>
                 <Header />
-
                 <div className="content-wrapper" style={{marginLeft: 0}}>
                     <section className="content-header">
                         <h1>
@@ -218,44 +313,75 @@ class CandidateDetail extends React.Component {
                                                     {/*<strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>*/}
                                                 {/*</p>*/}
 
-                                                <div className="chart">
-                                                    <ReactHighcharts config={spiderGraphConfig} />
-                                                </div>
+                                                <ReactHighcharts config={spiderGraphConfig} />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="box-footer" style={{display: "block"}}>
+
+                                    {/*<div className="box-footer" style={{display: "block"}}>*/}
+                                        {/*<div className="row">*/}
+                                            {/*<div className="col-sm-3 col-xs-6">*/}
+                                                {/*<div className="description-block border-right">*/}
+                                                    {/*<span className="description-percentage text-green"><i className="fa fa-caret-up"/> 17%</span>*/}
+                                                    {/*<h5 className="description-header">$35,210.43</h5>*/}
+                                                    {/*<span className="description-text">TOTAL REVENUE</span>*/}
+                                                {/*</div>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="col-sm-3 col-xs-6">*/}
+                                                {/*<div className="description-block border-right">*/}
+                                                    {/*<span className="description-percentage text-yellow"><i className="fa fa-caret-left"/> 0%</span>*/}
+                                                    {/*<h5 className="description-header">$10,390.90</h5>*/}
+                                                    {/*<span className="description-text">TOTAL COST</span>*/}
+                                                {/*</div>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="col-sm-3 col-xs-6">*/}
+                                                {/*<div className="description-block border-right">*/}
+                                                    {/*<span className="description-percentage text-green"><i className="fa fa-caret-up"/> 20%</span>*/}
+                                                    {/*<h5 className="description-header">$24,813.53</h5>*/}
+                                                    {/*<span className="description-text">TOTAL PROFIT</span>*/}
+                                                {/*</div>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="col-sm-3 col-xs-6">*/}
+                                                {/*<div className="description-block">*/}
+                                                    {/*<span className="description-percentage text-red"><i className="fa fa-caret-down"/> 18%</span>*/}
+                                                    {/*<h5 className="description-header">1200</h5>*/}
+                                                    {/*<span className="description-text">GOAL COMPLETIONS</span>*/}
+                                                {/*</div>*/}
+                                            {/*</div>*/}
+                                        {/*</div>*/}
+                                    {/*</div>*/}
+                                </div>
+                            </Col>
+                            <Col md={6}>
+                                <div className="box">
+                                    <div className="box-header with-border">
+                                        <h3 className="box-title">Candidate Skillset</h3>
+
+                                        <div className="box-tools pull-right">
+                                            <button type="button" className="btn btn-box-tool" data-widget="collapse"><i className="fa fa-minus"/>
+                                            </button>
+                                            <div className="btn-group">
+                                                <button type="button" className="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                                    <i className="fa fa-wrench"/></button>
+                                                <ul className="dropdown-menu" role="menu">
+                                                    <li><a href="#">Action</a></li>
+                                                    <li><a href="#">Another action</a></li>
+                                                    <li><a href="#">Something else here</a></li>
+                                                    <li className="divider"/>
+                                                    <li><a href="#">Separated link</a></li>
+                                                </ul>
+                                            </div>
+                                            <button type="button" className="btn btn-box-tool" data-widget="remove"><i className="fa fa-times"/></button>
+                                        </div>
+                                    </div>
+                                    <div className="box-body" style={{display: "block"}}>
                                         <div className="row">
-                                            <div className="col-sm-3 col-xs-6">
-                                                <div className="description-block border-right">
-                                                    <span className="description-percentage text-green"><i className="fa fa-caret-up"/> 17%</span>
-                                                    <h5 className="description-header">$35,210.43</h5>
-                                                    <span className="description-text">TOTAL REVENUE</span>
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-3 col-xs-6">
-                                                <div className="description-block border-right">
-                                                    <span className="description-percentage text-yellow"><i className="fa fa-caret-left"/> 0%</span>
-                                                    <h5 className="description-header">$10,390.90</h5>
-                                                    <span className="description-text">TOTAL COST</span>
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-3 col-xs-6">
-                                                <div className="description-block border-right">
-                                                    <span className="description-percentage text-green"><i className="fa fa-caret-up"/> 20%</span>
-                                                    <h5 className="description-header">$24,813.53</h5>
-                                                    <span className="description-text">TOTAL PROFIT</span>
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-3 col-xs-6">
-                                                <div className="description-block">
-                                                    <span className="description-percentage text-red"><i className="fa fa-caret-down"/> 18%</span>
-                                                    <h5 className="description-header">1200</h5>
-                                                    <span className="description-text">GOAL COMPLETIONS</span>
-                                                </div>
+                                            <div className="col-md-12">
+                                                <ReactHighcharts config={skillSetGraphConfig} />
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </Col>
                         </Row>
