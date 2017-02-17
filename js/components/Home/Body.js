@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import Relay from 'react-relay';
 import {Link} from 'react-router';
 import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
@@ -9,7 +10,7 @@ const HighchartsMore = require('highcharts-more');
 
 HighchartsMore(ReactHighcharts.Highcharts);
 
-
+const SEARCH_CANDIDATES_URL = 'https://padawanhire.herokuapp.com/get-candidates';
 const TEXTAREA_PLACEHOLDER = `Web Developer
 
 San Jose, CA
@@ -71,9 +72,14 @@ const highchartsConfig = {
 class Body extends React.Component {
     constructor(props) {
         super(props);
+        this.allCandidates = {};
+        this.props.allCandidateInfos.edges.forEach((edge) => {
+            this.allCandidates[edge.node.id] = edge.node;
+        })
         this.state = {
             jobDescription: '',
             isSearching: false,
+            candidates: this.props.allCandidateInfos.edges.map((edge) => edge.node),
             errors: []
         };
     }
@@ -98,15 +104,15 @@ class Body extends React.Component {
                                 >
                                     {/*<ControlLabel> Working example with validation</ControlLabel>*/}
                                     <FormControl componentClass="textarea"
-                                                 placeholder={TEXTAREA_PLACEHOLDER}
-                                                 value={this.state.jobDescription}
-                                                 rows={25}
-                                                 onChange={(e) => this.setState({jobDescription: e.target.value})}
+                                        placeholder={TEXTAREA_PLACEHOLDER}
+                                        value={this.state.jobDescription}
+                                        rows={25}
+                                        onChange={(e) => this.setState({jobDescription: e.target.value})}
                                     />
                                 </FormGroup>
                                 <Button bsStyle="primary" bsSize="large" block style={{padding: 20}}
-                                        disabled={!this.state.jobDescription || this.state.isSearching }
-                                        onClick={() => this.onClickSearch(user.id)}
+                                    disabled={!this.state.jobDescription || this.state.isSearching }
+                                    onClick={() => this.onClickSearch(user.id)}
                                 >{this.state.isSearching ? "Searching..." : "Search"}
                                 </Button>
                             </form>
@@ -116,7 +122,7 @@ class Body extends React.Component {
 
                 <Row style={styles.subheading}>
                     <Col smOffset={2} sm={8}>
-                        { this.props.allCandidateInfos.edges.map(edge => this.renderCandidateRow(edge.node)) }
+                        { this.state.candidates.map(candidate => this.renderCandidateRow(candidate)) }
                     </Col>
                 </Row>
             </div>
@@ -174,12 +180,33 @@ class Body extends React.Component {
 
         createJobWithDescriptionAndUserId(this.state.jobDescription, userId).then(data => {
             if (!data.errors) {
-                this.setState({ errors: [], isSearching: false});
+                this.setState({ errors: []}, () => {
+                    this.searchCandidates(this.state.jobDescription)
+                });
             } else {
                 this.setState({ errors: data.errors, isSearching: false });
             }
         }).catch(errors => {
             console.error("createJobWithDescriptionAndUserId threw errors", errors);
+            this.setState({ errors });
+        });
+    }
+
+    searchCandidates(query) {
+        axios.post(SEARCH_CANDIDATES_URL, {
+            'query': query
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            const candidates = response.data.candidates || [];
+            const searchedCandidates = candidates.map((candidate) => {
+                return this.allCandidates[candidate.id]
+            });
+            this.setState({candidates: searchedCandidates, isSearching: false});
+        }).catch(errors => {
+            console.error("Search Candidates threw errors", errors);
             this.setState({ errors });
         });
     }
