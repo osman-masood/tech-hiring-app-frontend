@@ -78,8 +78,8 @@ class Hero extends React.Component {
                         <h1>Welcome!</h1>
                         <br />
                         <p>
+                            <FontAwesome name="hand-paper-o" /> &nbsp;
                             Login to PadawanHire, you will.
-                            &nbsp;<FontAwesome name="hand-paper-o" />
                         </p>
                         <br />
                         { this.renderLoginForm() }

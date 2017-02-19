@@ -69,23 +69,24 @@ const highchartsConfig = {
     }
 };
 
-class Body extends React.Component {
+class Search extends React.Component {
     constructor(props) {
         super(props);
         this.allCandidates = {};
         this.props.allCandidateInfos.edges.forEach((edge) => {
             this.allCandidates[edge.node.id] = edge.node;
-        })
+        });
         this.state = {
             jobDescription: '',
+            createdJobId: null,
             isSearching: false,
-            candidates: this.props.allCandidateInfos.edges.map((edge) => edge.node),
+            candidates: [],
             errors: []
         };
     }
 
     render() {
-        console.log("Body called with props=", this.props);
+        console.log("Search called with props=", this.props);
         const user = JSON.parse(localStorage.getItem('user'));
         const loggedInUser = user ? user.username : '';
 
@@ -103,10 +104,16 @@ class Body extends React.Component {
                                     bsSize="lg"
                                 >
                                     {/*<ControlLabel> Working example with validation</ControlLabel>*/}
-                                    <FormControl componentClass="textarea"
+                                    <FormControl
+                                        componentClass="textarea"
                                         placeholder={TEXTAREA_PLACEHOLDER}
                                         value={this.state.jobDescription}
                                         rows={25}
+                                        onKeyPress={(event) => {
+                                            if (event.key === 'Enter' && (event.ctrlKey || event.altKey)) {
+                                                this.onClickSearch(user.id)
+                                            }
+                                        }}
                                         onChange={(e) => this.setState({jobDescription: e.target.value})}
                                     />
                                 </FormGroup>
@@ -131,15 +138,17 @@ class Body extends React.Component {
 
     //noinspection JSMethodCanBeStatic
     renderCandidateRow(candidateInfoObj) {
+        const profileUrl = `/profile/${this.state.createdJobId}/${candidateInfoObj.user.id}`;
+
         return <Row key={candidateInfoObj.id} className="well">
             <Col sm={2}>
-                <Link to={`/profile/${candidateInfoObj.user.id}`}>
+                <Link to={profileUrl}>
                     <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
                 </Link>
             </Col>
             <Col sm={6}>
                 <Row>
-                    <Link to={`/profile/${candidateInfoObj.user.id}`}>
+                    <Link to={profileUrl}>
                         <Col>
                             <h2>{candidateInfoObj.user.fullName || "Unknown Warrior"}</h2>
                         </Col>
@@ -178,9 +187,11 @@ class Body extends React.Component {
         this.setState({isSearching: true});
         console.log(`onClickSearch: jobDescription: ${this.state.jobDescription}, userId: ${userId}`);
 
+        // Create the Job Description and then search candidates w/ Python API
         createJobWithDescriptionAndUserId(this.state.jobDescription, userId).then(data => {
+            console.log("onClickSearch => createJobWithDescriptionAndUserId => data: ", data);
             if (!data.errors) {
-                this.setState({ errors: []}, () => {
+                this.setState({ errors: [], createdJobId: data.createJob.changedJob.id}, () => {
                     this.searchCandidates(this.state.jobDescription)
                 });
             } else {
@@ -232,7 +243,7 @@ function createJobWithDescriptionAndUserId(description, userId) {
     });
 }
 
-export default Relay.createContainer(Body, {
+export default Relay.createContainer(Search, {
     fragments: { }
 });
 

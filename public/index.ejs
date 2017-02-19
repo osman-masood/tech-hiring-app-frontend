@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.8.0/graphiql.css">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-aNUYGqSUL9wG/vP7+cWZ5QOM4gsQou3sBfWRr/8S3R1Lv0rysEmnwsRKMbhiQX/O" crossorigin="anonymous">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <title>PadawanHire</title>
+    <title><%= config.title %></title>
 </head>
 <style>
     html, body {
@@ -17,6 +17,13 @@
 </style>
 <body>
 <div id="root"></div>
-<script src="/dist/main.js?f3d69e52c9c62a576362"></script>
+<script src="<%= bundle %>"></script>
+<%_ if (!debug && config.trackingID) { _%>
+<script>
+    window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+    ga('create','<%= config.trackingID %>','auto');ga('send','pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async defer></script>
+<%_ } _%>
 </body>
 </html>

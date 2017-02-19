@@ -3,3 +3,11 @@ node_modules
 npm-debug.log
 data/schema.graphql
 .idea/workspace.xml
+
+# Compiled output
+public/dist
+public/index.html
+public/sitemap.xml
+
+# Firebase
+firebase-debug.log

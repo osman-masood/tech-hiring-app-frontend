@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {Button} from 'react-bootstrap';
 import {browserHistory} from 'react-router';
 import Header from './Header';
-import Body from './Body';
+import Search from './Search';
 
 class Home extends React.Component {
     //noinspection JSUnusedGlobalSymbols
@@ -22,11 +22,13 @@ class Home extends React.Component {
         return (
             <div>
                 <Header />
-                <Body allCandidateInfos={this.props.viewer.allCandidateInfos}/>
+                <Search allCandidateInfos={this.props.viewer.allCandidateInfos}/>
             </div>
         );
     }
 }
+
+// TODO: Instead of getting all candidate infos and passing it into Search, we need Search to have its own fragment and variables.
 
 export default Relay.createContainer(Home, {
     initialVariables: {},
@@ -53,4 +55,6 @@ export default Relay.createContainer(Home, {
                 }
             }
 `
-}});
+}
+
+});

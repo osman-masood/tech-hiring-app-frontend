@@ -20,8 +20,13 @@ export const ProfileQueries = {
         return Relay.QL`
             query {
                 getUser(id: $userId)
-            }
-`
+            }`
+    },
+    job: () => {
+        return Relay.QL`
+            query {
+                getJob(id: $jobId)
+            }`
     }
 };
 
