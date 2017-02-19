@@ -34,7 +34,7 @@ ReactDOM.render(
     >
         <Route path="/" component={App} />
         <Route path="/home" component={Home} queries={HomeQueries} prepareParams={prepareHomeParams}/>
-        <Route path="/profile/:userId" component={CandidateDetail} queries={ProfileQueries} prepareParams={prepareProfileParams} />
+        <Route path="/profile/:jobId/:userId" component={CandidateDetail} queries={ProfileQueries} prepareParams={prepareProfileParams} />
         <Route path="/graphiql" component={GraphiQLModule} />
     </Router>,
     document.getElementById('root')
