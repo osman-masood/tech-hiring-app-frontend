@@ -6,6 +6,8 @@ import Relay from 'react-relay';
 import { Router, Route, IndexRoute, applyRouterMiddleware, browserHistory, routes} from 'react-router';
 import useRelay from 'react-router-relay';
 import config from './../config';
+import ReactHighcharts from 'react-highcharts/dist/bundle/ReactHighcharts'
+import HighchartsMore from 'highcharts-more'
 
 import App from './components/App/App';
 import Home from './components/Home/Home';
@@ -20,6 +22,8 @@ if (localStorage.scapholdAuthToken) {
         Authorization: 'Bearer ' + localStorage.scapholdAuthToken
     }
 }
+
+HighchartsMore(ReactHighcharts.Highcharts);
 
 Relay.injectNetworkLayer(
     new Relay.DefaultNetworkLayer(config.scapholdUrl, options)

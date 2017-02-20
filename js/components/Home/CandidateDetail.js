@@ -25,8 +25,6 @@ const getGithubReposUrl = (githubUsername) => githubUsername ? `https://github.c
 const getGithubOverviewUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}` : null;
 const getHackerRankUrl = (hackerRankUsername) => hackerRankUsername ? `https://www.hackerrank.com/${hackerRankUsername}` : null;
 
-HighchartsMore(ReactHighcharts.Highcharts);
-
 var commonGraphConfig = {
 
     chart: {
@@ -130,23 +128,37 @@ class CandidateDetail extends React.Component {
         } else {
             const skillsCategories = this.candidateSkillsData.map((data) => data[0]);
             const skillsData = this.candidateSkillsData.map((data) => data[1]);
-            commonGraphConfig.xAxis.categories = skillsCategories;
-            commonGraphConfig.series[0].data = skillsData;
-            skillsGraph = <ReactHighcharts config={commonGraphConfig} />;
+            if (skillsCategories.length) {
+                commonGraphConfig.xAxis.categories = skillsCategories;
+                commonGraphConfig.series[0].data = skillsData;
+                skillsGraph = <ReactHighcharts config={commonGraphConfig} />;
+            } else {
+                skillsGraph = <div className="no-data">Insufficient Data</div>;
+            }
 
             const graphConfig = JSON.stringify(commonGraphConfig);
             commonGraphConfig = JSON.parse(graphConfig);
 
             const jobSkillsCategories = this.candidateJobSkillsData.map((data) => data[0]);
             const jobSkillsData = this.candidateJobSkillsData.map((data) => data[1]);
-            commonGraphConfig.xAxis.categories = jobSkillsCategories;
-            commonGraphConfig.series[0].data = jobSkillsData;
-            skillsRelevancyGraph = <ReactHighcharts config={commonGraphConfig} />;
+
+            if (jobSkillsCategories.length) {
+                commonGraphConfig.xAxis.categories = jobSkillsCategories;
+                commonGraphConfig.series[0].data = jobSkillsData;
+                skillsRelevancyGraph = <ReactHighcharts config={commonGraphConfig} />;
+            } else {
+                skillsRelevancyGraph = <div className="no-data">Insufficient Data</div>;
+            }
 
             commonGraphConfig = JSON.parse(graphConfig);
             commonGraphConfig.chart.type = 'column';
             commonGraphConfig.chart.polar = false;
-            skillsBarGraph = <ReactHighcharts config={commonGraphConfig} />;
+
+            if (skillsCategories.length) {
+                skillsBarGraph = <ReactHighcharts config={commonGraphConfig} />;
+            } else {
+                skillsBarGraph = <div className="no-data">Insufficient Data</div>;
+            }
 
         }
         const joinedCurrentYear = new Date(this.props.user.createdAt).getUTCFullYear() === new Date().getUTCFullYear();

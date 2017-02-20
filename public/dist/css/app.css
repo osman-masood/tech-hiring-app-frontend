@@ -6,3 +6,8 @@
 .loader {
     line-height: 402px !important;
 }
+
+.no-data {
+    min-height: 400px;
+    line-height: 400px;
+}

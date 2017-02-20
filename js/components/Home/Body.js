@@ -5,6 +5,8 @@ import {Link} from 'react-router';
 import {Row, Col, Button, FormControl, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
 import FontAwesome from 'react-fontawesome';
 import CreateJobMutation from "../../mutations/CreateJobMutation";
+const ReactHighcharts = require('react-highcharts');
+const HighchartsMore = require('highcharts-more');
 
 const SEARCH_CANDIDATES_URL = 'https://padawanhire.herokuapp.com/get-candidates';
 const TEXTAREA_PLACEHOLDER = `Web Developer
