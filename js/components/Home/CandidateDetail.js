@@ -9,8 +9,11 @@ import axios from 'axios';
 import Relay from 'react-relay';
 import Squares from 'react-activity/lib/Squares';
 import {browserHistory} from 'react-router';
-import ReactHighcharts from 'react-highcharts/dist/bundle/ReactHighcharts'
-import HighchartsMore from 'highcharts-more'
+
+import ReactHighcharts from './highchartsLoader';
+
+// import ReactHighcharts from 'react-highcharts/dist/bundle/ReactHighcharts'
+// import HighchartsMore from 'highcharts-more'
 import Header from './Header';
 import {Row, Col, Button, FormControl, ButtonToolbar, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
 
@@ -24,8 +27,9 @@ import moment from 'moment';
 const getGithubReposUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}?tab=repositories` : null;
 const getGithubOverviewUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}` : null;
 const getHackerRankUrl = (hackerRankUsername) => hackerRankUsername ? `https://www.hackerrank.com/${hackerRankUsername}` : null;
+const getSkillsUrl = candidateId => `https://padawanhire.herokuapp.com/candidates/${candidateId}/skills`;
 
-var commonGraphConfig = {
+let commonGraphConfig = {
 
     chart: {
         polar: true,
@@ -85,31 +89,42 @@ class CandidateDetail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataLoaded: false,
-            errors: []
+            isSkillDataLoaded: false,
+            errors: [],
+            isLiked: false,
+            isArchived: false
         };
         this.candidateSkillsData = [];
         this.candidateJobSkillsData = [];
         console.log("CandidateDetail.constructor() called with props", this.props);
     }
 
+    onClickLike() {
+
+    }
+
+    onClickArchive() {
+
+    }
+
     componentDidMount() {
-        const candidateID = this.props.user.candidateInfo.id;
+        // Fetch Skills data for candidate and for candidate relevancy to job description
+        const candidateId = this.props.user.candidateInfo.id;
         const jobDescription = this.props.job.description;
-        const SKILLS_URL = `https://padawanhire.herokuapp.com/candidates/${candidateID}/skills`;
-        axios.all([axios.get(SKILLS_URL), axios.get(SKILLS_URL, {
+        const skillsUrl = getSkillsUrl(candidateId);
+        axios.all([axios.get(skillsUrl), axios.get(skillsUrl, {
             params: {
                 'job_description': jobDescription
             }
         })]).then(axios.spread((skillsDescription, jobSkillsDescription) => {
-            console.info("candidateSkills candidateID:", candidateID, "jobDescription:", jobDescription,
-            "responseSkills:", skillsDescription, "responseSkillsJob:", jobSkillsDescription);
+            console.info("Skills API response: candidateSkills candidateId:", candidateId, "jobDescription:", jobDescription,
+                "skillsDescription:", skillsDescription, "jobSkillsDescription:", jobSkillsDescription);
             this.candidateSkillsData = skillsDescription.data.skills || [];
-            this.candidateJobSkillsData = jobSkillsDescription.data.skills || [];
-            this.setState({dataLoaded: true});
+            this.candidateJobSkillsData = jobSkillsDescription.data.skills || [];  // Tuples of (skill, weight)
+            this.setState({isSkillDataLoaded: true});
         })).catch(errors => {
-            console.error("candidateSkills threw errors", errors);
-            this.setState({ errors: errors, dataLoaded: false });
+            console.error("Getting candidateSkills threw errors", errors);
+            this.setState({ errors: errors, isSkillDataLoaded: false });
         });
     }
 
@@ -120,8 +135,9 @@ class CandidateDetail extends React.Component {
             browserHistory.push('/');
         }
 
-        var skillsGraph, skillsRelevancyGraph, skillsBarGraph;
-        if (!this.state.dataLoaded) {
+        let skillsGraph, skillsRelevancyGraph, skillsBarGraph;
+
+        if (!this.state.isSkillDataLoaded) {
             skillsGraph = <Squares className="loader" color="#3c8dbc" size={55} speed={0.7} />;
             skillsRelevancyGraph = <Squares className="loader" color="#3c8dbc" size={55} speed={0.7} />;
             skillsBarGraph = <Squares className="loader" color="#3c8dbc" size={55} speed={0.7} />;
@@ -185,24 +201,21 @@ class CandidateDetail extends React.Component {
         // OR: http://www.highcharts.com/demo/polar-spider
         // Also, graph of activity over time for each service: http://www.highcharts.com/demo/line-basic
 
-        const isLiked = false;
-        const isHidden = false;
-
         return (
             <Row>
                 <Header />
                 <Row className="content-wrapper" style={{marginLeft: 0}}>
-                    <section className="content-header">
+                    <section className="content-header" style={{marginLeft: 20, marginRight: 20}}>
                         <h1>
                             <span>{this.props.user.fullName || this.props.user.username}</span>
                             <small>Joined {joinedDate}</small>
-                            <a className={"btn btn-app" + (isLiked ? " bg-green" : "")} style={styles.topButtons}>
+                            <a className={"btn btn-app" + (this.state.isLiked ? " bg-green" : "")} style={styles.topButtons}>
                                 <i className="fa fa-heart-o" />
-                                { isLiked ? "Liked": "Like" }
+                                { this.state.isLiked ? "Liked": "Like" }
                             </a>
-                            <a className={"btn btn-app" + (isLiked ? " bg-gray" : "")} style={styles.topButtons}>
+                            <a className={"btn btn-app" + (this.state.isHidden ? " bg-gray" : "")} style={styles.topButtons}>
                                 <i className="fa fa-archive"/>
-                                {isHidden ? "Hidden" : "Don't show"}
+                                {this.state.isHidden ? "Hidden" : "Don't show"}
                             </a>
                             <a className="btn btn-app" style={styles.topButtons}>
                                 <i className="fa fa-phone"/> Call Padawan
@@ -212,7 +225,7 @@ class CandidateDetail extends React.Component {
                             </a> {/* fa-calendar-check-o is for "Call Scheduled */}
                         </h1>
                     </section>
-                    <section className="content">
+                    <section className="content" style={{marginLeft: 20, marginRight: 20}}>
                         <Row>
                             <StatTile
                                 width={3}
@@ -461,7 +474,7 @@ class CandidateDetail extends React.Component {
                         </Row>
 
 
-                        <div className="row">
+                        <Row>
 
                             <div className="col-md-6">
 
@@ -488,76 +501,20 @@ class CandidateDetail extends React.Component {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                                        <td>Call of Duty IV</td>
-                                                        <td><span className="label label-success">Shipped</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style={{display: "inline-block", width: 34, height: 20, verticalAlign: "top"}}></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                                                        <td>Samsung Smart TV</td>
-                                                        <td><span className="label label-warning">Pending</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                                        <td>iPhone 6 Plus</td>
-                                                        <td><span className="label label-danger">Delivered</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                                        <td>Samsung Smart TV</td>
-                                                        <td><span className="label label-info">Processing</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                                                        <td>Samsung Smart TV</td>
-                                                        <td><span className="label label-warning">Pending</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                                        <td>iPhone 6 Plus</td>
-                                                        <td><span className="label label-danger">Delivered</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                                        <td>Call of Duty IV</td>
-                                                        <td><span className="label label-success">Shipped</span></td>
-                                                        <td>
-                                                            <div className="sparkbar">
-                                                                {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+
+                                                <tr>
+                                                    <td>34</td>
+                                                    <td>Osman Masood</td>
+                                                    <td>
+                                                        <span className="label label-success">Shipped</span>
+                                                        <span className="label label-warning">Pending</span>
+                                                        <span className="label label-danger">Delivered</span>
+                                                        <span className="label label-info">Processing</span>
+                                                    </td>
+                                                    <td>
+                                                        Web Developer
+                                                    </td>
+                                                </tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -592,81 +549,24 @@ class CandidateDetail extends React.Component {
                                             <table className="table no-margin">
                                                 <thead>
                                                 <tr>
-                                                    <th>Order ID</th>
-                                                    <th>Item</th>
+                                                    <th>Views</th>
+                                                    <th>Hiring Manager</th>
                                                     <th>Status</th>
-                                                    <th>Popularity</th>
+                                                    <th>Job</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
                                                 <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                                    <td>Call of Duty IV</td>
-                                                    <td><span className="label label-success">Shipped</span></td>
+                                                    <td>34</td>
+                                                    <td>Osman Masood</td>
                                                     <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style={{display: "inline-block", width: 34, height: 20, verticalAlign: "top"}}></canvas>*/}
-                                                        </div>
+                                                        <span className="label label-success">Shipped</span>
+                                                        <span className="label label-warning">Pending</span>
+                                                        <span className="label label-danger">Delivered</span>
+                                                        <span className="label label-info">Processing</span>
                                                     </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                                                    <td>Samsung Smart TV</td>
-                                                    <td><span className="label label-warning">Pending</span></td>
                                                     <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                                    <td>iPhone 6 Plus</td>
-                                                    <td><span className="label label-danger">Delivered</span></td>
-                                                    <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                                    <td>Samsung Smart TV</td>
-                                                    <td><span className="label label-info">Processing</span></td>
-                                                    <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR1848</a></td>
-                                                    <td>Samsung Smart TV</td>
-                                                    <td><span className="label label-warning">Pending</span></td>
-                                                    <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR7429</a></td>
-                                                    <td>iPhone 6 Plus</td>
-                                                    <td><span className="label label-danger">Delivered</span></td>
-                                                    <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                                    <td>Call of Duty IV</td>
-                                                    <td><span className="label label-success">Shipped</span></td>
-                                                    <td>
-                                                        <div className="sparkbar">
-                                                            {/*<canvas width="34" height="20" style="display: inline-block; width: 34px; height: 20px; vertical-align: top;"></canvas>*/}
-                                                        </div>
+                                                        Web Developer
                                                     </td>
                                                 </tr>
                                                 </tbody>
@@ -681,7 +581,7 @@ class CandidateDetail extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </Row>
                     </section>
                 </Row>
             </Row>
@@ -709,6 +609,8 @@ export default Relay.createContainer(CandidateDetail, {
                     codeFightsUsername
                     modifiedAt
                     createdAt
+
+
                 }
             }`,
         job: () => Relay.QL`
