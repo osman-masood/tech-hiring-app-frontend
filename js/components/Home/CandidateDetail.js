@@ -9,11 +9,11 @@ import axios from 'axios';
 import Relay from 'react-relay';
 import Squares from 'react-activity/lib/Squares';
 import {browserHistory} from 'react-router';
+import ReactHighcharts from 'react-highcharts/dist/bundle/ReactHighcharts'
+import HighchartsMore from 'highcharts-more'
 import Header from './Header';
 import {Row, Col, Button, FormControl, ButtonToolbar, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
-const ReactHighcharts = require('react-highcharts');
-const HighchartsMore = require('highcharts-more');
-HighchartsMore(ReactHighcharts.Highcharts);
+
 const reactjsAdminlte = require('adminlte-reactjs');
 const InfoTile = reactjsAdminlte.InfoTile;
 // const Box = reactjsAdminlte.CustomBox;
@@ -25,7 +25,9 @@ const getGithubReposUrl = (githubUsername) => githubUsername ? `https://github.c
 const getGithubOverviewUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}` : null;
 const getHackerRankUrl = (hackerRankUsername) => hackerRankUsername ? `https://www.hackerrank.com/${hackerRankUsername}` : null;
 
-var spiderGraphConfig = {
+HighchartsMore(ReactHighcharts.Highcharts);
+
+var commonGraphConfig = {
 
     chart: {
         polar: true,
@@ -36,10 +38,6 @@ var spiderGraphConfig = {
         text: '',
         x: -80
     },
-
-    // pane: {
-    //     size: '80%'
-    // },
 
     xAxis: {
         categories: [],
@@ -75,49 +73,6 @@ var spiderGraphConfig = {
     credits: {
         enabled: false
     }
-};
-
-const skillSetGraphConfig = {
-    chart: {
-        type: 'column'
-    },
-
-    title: {
-        text: ''
-    },
-
-    yAxis: {
-        categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-    },
-
-    xAxis: {
-        allowDecimals: false,
-        min: 0,
-        title: {
-            text: 'Number of fruits'
-        }
-    },
-    //
-    // tooltip: {
-    //     formatter: function () {
-    //         return '<b>' + this.x + '</b><br/>' +
-    //             this.series.name + ': ' + this.y + '<br/>' +
-    //             'Total: ' + this.point.stackTotal;
-    //     }
-    // },
-
-    // plotOptions: {
-    //     column: {
-    //         stacking: 'normal'
-    //     }
-    // },
-
-    series: [{
-        name: 'John',
-        data: [5, 3, 4, 7, 2],
-        // stack: 'male'
-    }
-    ]
 };
 
 
@@ -167,26 +122,32 @@ class CandidateDetail extends React.Component {
             browserHistory.push('/');
         }
 
-        var skillsGraph;
-        var skillsRelevancyGraph;
+        var skillsGraph, skillsRelevancyGraph, skillsBarGraph;
         if (!this.state.dataLoaded) {
             skillsGraph = <Squares className="loader" color="#3c8dbc" size={55} speed={0.7} />;
             skillsRelevancyGraph = <Squares className="loader" color="#3c8dbc" size={55} speed={0.7} />;
+            skillsBarGraph = <Squares className="loader" color="#3c8dbc" size={55} speed={0.7} />;
         } else {
             const skillsCategories = this.candidateSkillsData.map((data) => data[0]);
             const skillsData = this.candidateSkillsData.map((data) => data[1]);
-            spiderGraphConfig.xAxis.categories = skillsCategories;
-            spiderGraphConfig.series[0].data = skillsData;
-            skillsGraph = <ReactHighcharts config={spiderGraphConfig} />;
+            commonGraphConfig.xAxis.categories = skillsCategories;
+            commonGraphConfig.series[0].data = skillsData;
+            skillsGraph = <ReactHighcharts config={commonGraphConfig} />;
 
-            spiderGraphConfig = JSON.stringify(spiderGraphConfig);
-            spiderGraphConfig = JSON.parse(spiderGraphConfig);
+            const graphConfig = JSON.stringify(commonGraphConfig);
+            commonGraphConfig = JSON.parse(graphConfig);
 
             const jobSkillsCategories = this.candidateJobSkillsData.map((data) => data[0]);
             const jobSkillsData = this.candidateJobSkillsData.map((data) => data[1]);
-            spiderGraphConfig.xAxis.categories = jobSkillsCategories;
-            spiderGraphConfig.series[0].data = jobSkillsData;
-            skillsRelevancyGraph = <ReactHighcharts config={spiderGraphConfig} />;
+            commonGraphConfig.xAxis.categories = jobSkillsCategories;
+            commonGraphConfig.series[0].data = jobSkillsData;
+            skillsRelevancyGraph = <ReactHighcharts config={commonGraphConfig} />;
+
+            commonGraphConfig = JSON.parse(graphConfig);
+            commonGraphConfig.chart.type = 'column';
+            commonGraphConfig.chart.polar = false;
+            skillsBarGraph = <ReactHighcharts config={commonGraphConfig} />;
+
         }
         const joinedCurrentYear = new Date(this.props.user.createdAt).getUTCFullYear() === new Date().getUTCFullYear();
         const joinedDate = moment(this.props.user.createdAt).format('MMMM D' + (joinedCurrentYear ? '' : ', YYYY'));
@@ -369,7 +330,7 @@ class CandidateDetail extends React.Component {
                                     <div className="box-body graph-box">
                                         <div className="row">
                                             <div className="col-md-12">
-                                                <ReactHighcharts config={skillSetGraphConfig} />
+                                                {skillsBarGraph}
                                             </div>
                                         </div>
                                     </div>
