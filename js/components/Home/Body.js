@@ -261,7 +261,7 @@ class Body extends React.Component {
                     <ReactHighcharts config={activityConfig} />
                 </div>
             </Col>
-            <Col sm={5}>
+            <Col sm={5} className="name-area">
                 <Row>
                     <Link to={profileUrl}>
                         <Col>
