@@ -167,7 +167,7 @@ class CandidateDetail extends React.Component {
             }
 
             commonGraphConfig = JSON.parse(graphConfig);
-            commonGraphConfig.chart.type = 'column';
+            commonGraphConfig.chart.type = 'bar';
             commonGraphConfig.chart.polar = false;
 
             if (skillsCategories.length) {
@@ -176,6 +176,13 @@ class CandidateDetail extends React.Component {
                 skillsBarGraph = <div className="no-data">Insufficient Data</div>;
             }
 
+        }
+        var relevancyScore;
+        try {
+            relevancyScore = (parseFloat(atob(this.props.relevancyScore))).toString();
+        } catch (e) {
+            console.error(`Relevancy Score: ${this.props.relevancyScore} is not properly encoded`);
+            return <div></div>;
         }
         const joinedCurrentYear = new Date(this.props.user.createdAt).getUTCFullYear() === new Date().getUTCFullYear();
         const joinedDate = moment(this.props.user.createdAt).format('MMMM D' + (joinedCurrentYear ? '' : ', YYYY'));
@@ -230,7 +237,7 @@ class CandidateDetail extends React.Component {
                             <StatTile
                                 width={3}
                                 icon='fa-bullseye'
-                                stats={ "20" }
+                                stats={ `${relevancyScore}%` }
                                 subject='Relevancy Score'
                                 theme='bg-red'>
                             </StatTile>

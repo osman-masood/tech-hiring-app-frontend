@@ -32,23 +32,75 @@ Requirements
 • BSc degree in Computer Science or relevant field`;
 
 
-const highchartsConfig = {
+const spiderChartConfig = {
     chart: {
         polar: true,
+        type: 'line',
         height: 150,
         backgroundColor: '#f5f5f5',
         plotBackgroundColor: '#f5f5f5',
-        plotBorderColor: '#f5f5f5',
+        plotBorderColor: '#f5f5f5'
     },
+
     backgroundColor: '#f5f5f5',
     borderColor: '#f5f5f5',
-    title: null,
-    xAxis: {
-        categories: ['C', 'C++', 'Java', 'Python', 'JS', 'C#', 'iOS', 'React', 'Angular', 'Bootstrap', 'CSS', 'HTML']
+
+    title: {
+        text: '',
+        x: -80
     },
+
+    xAxis: {
+        categories: [],
+        tickmarkPlacement: 'on',
+        lineWidth: 0
+    },
+
+    yAxis: {
+        gridLineInterpolation: 'polygon',
+        lineWidth: 0,
+        min: 0
+    },
+
+    tooltip: {
+        shared: true,
+        pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:,.0f}</b><br/>'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    exporting: {
+        enabled: false
+    },
+
     series: [{
-        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+        name: 'Skills Relevancy',
+        data: [],
+        pointPlacement: 'on'
     }],
+
+    credits: {
+        enabled: false
+    },
+
+    pane: {
+        background: {
+            backgroundColor: '#f5f5f5',
+            borderColor: '#f5f5f5',
+        }
+    }
+};
+
+const activityChartConfig = {
+
+    chart: {
+        type: 'solidgauge',
+        backgroundColor: null,
+        height: 160
+    },
+    title: null,
     credits: {
         enabled: false
     },
@@ -58,13 +110,63 @@ const highchartsConfig = {
     exporting: {
         enabled: false
     },
+    tooltip: {
+        enabled: false
+    },
     pane: {
-        background: {
-            backgroundColor: '#f5f5f5',
-            borderColor: '#f5f5f5',
+        startAngle: 0,
+        endAngle: 360,
+        background: [{
+            outerRadius: '112%',
+            innerRadius: '80%',
+            backgroundColor: ReactHighcharts.Highcharts.Color(ReactHighcharts.Highcharts.getOptions().colors[0]).setOpacity(0.25).get(),
+            borderWidth: 0
+        }]
+    },
+
+    yAxis: {
+        min: 0,
+        max: 100,
+        lineWidth: 0,
+        tickPositions: []
+    },
+
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                enabled: true,
+                borderWidth: 0,
+                y: -15,
+                backgroundColor: 'none',
+                useHTML: true,
+                shadow: false,
+                formatter: function() {
+                    return '<div style="width:100%;text-align:center;"><span style="font-size:2em;color:' + ReactHighcharts.Highcharts.getOptions().colors[0] + ';font-weight:bold;">' + this.y + '%</span>';
+                }
+            },
+            linecap: 'round',
+            stickyTracking: false,
+            rounded: true
         }
-    }
+    },
+
+    series: [{
+        name: '',
+        borderColor: ReactHighcharts.Highcharts.getOptions().colors[0],
+        data: [{
+            color: ReactHighcharts.Highcharts.getOptions().colors[0],
+            radius: '112%',
+            innerRadius: '80%',
+            y: 60
+        }]
+    }]
 };
+
+const solidGaugeFormatter =  (y) => {
+    return () => {
+        return '<div style="width:100%;text-align:center;"><span style="font-size:2em;color:' + ReactHighcharts.Highcharts.getOptions().colors[0] + ';font-weight:bold;">' + y + '%</span>';
+    };
+}
 
 class Body extends React.Component {
     constructor(props) {
@@ -135,15 +237,31 @@ class Body extends React.Component {
 
     //noinspection JSMethodCanBeStatic
     renderCandidateRow(candidateInfoObj) {
-        const profileUrl = `/profile/${this.state.createdJobId}/${candidateInfoObj.user.id}`;
+        const profileUrl = `/profile/${this.state.createdJobId}/${candidateInfoObj.user.id}/${btoa(candidateInfoObj.relevancyScore)}`;
+        var activityConfig = JSON.parse(JSON.stringify(activityChartConfig));
+        activityConfig.series[0].data[0].y = parseInt(candidateInfoObj.relevancyScore);
+        activityConfig.plotOptions.solidgauge.dataLabels.formatter = solidGaugeFormatter(parseInt(candidateInfoObj.relevancyScore));
+
+        var skillsGraph = '';
+        const skillsCategories = candidateInfoObj.skills.map((data) => data[0]);
+        const skillsData = candidateInfoObj.skills.map((data) => data[1]);
+
+        if (skillsCategories.length) {
+            var spiderConfig = JSON.parse(JSON.stringify(spiderChartConfig));
+            spiderConfig.xAxis.categories = skillsCategories;
+            spiderConfig.series[0].data = skillsData;
+            skillsGraph = <ReactHighcharts config={spiderConfig} />;
+        } else {
+            skillsGraph = <span></span>
+        }
 
         return <Row key={candidateInfoObj.id} className="well">
-            <Col sm={2}>
-                <Link to={profileUrl}>
-                    <Image src={candidateInfoObj.thumbnailUrl || "http://lorempixel.com/75/75/people/"} circle />
-                </Link>
+            <Col sm={3}>
+                <div className="solid-gauge-relevancy">
+                    <ReactHighcharts config={activityConfig} />
+                </div>
             </Col>
-            <Col sm={6}>
+            <Col sm={5}>
                 <Row>
                     <Link to={profileUrl}>
                         <Col>
@@ -152,30 +270,30 @@ class Body extends React.Component {
                     </Link>
                 </Row>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         { candidateInfoObj.githubUsername ?
                             <a target="_blank" href={"https://github.com/" + candidateInfoObj.githubUsername}>Github</a>
                             : "Github"
                         }
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         { candidateInfoObj.hackerRankUsername ?
                             <a target="_blank"
-                               href={"https://www.hackerrank.com/" + candidateInfoObj.hackerRankUsername}>HackerRank</a>
+                                href={"https://www.hackerrank.com/" + candidateInfoObj.hackerRankUsername}>HackerRank</a>
                             : "HackerRank"
                         }
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         { candidateInfoObj.codeFightsUsername ?
                             <a target="_blank"
-                               href={"https://codefights.com/profile/" + candidateInfoObj.codeFightsUsername}>CodeFights</a>
+                                href={"https://codefights.com/profile/" + candidateInfoObj.codeFightsUsername}>CodeFights</a>
                             : "CodeFight"
                         }
                     </Col>
                 </Row>
             </Col>
             <Col sm={4}>
-                <ReactHighcharts config={highchartsConfig} />
+                { skillsGraph }
             </Col>
         </Row>;
     }
@@ -211,7 +329,10 @@ class Body extends React.Component {
             console.info("searchCandidates query:", query, "response:", response);
             const candidates = response.data.candidates || [];
             const searchedCandidates = candidates.map((candidate) => {
-                return this.allCandidates[candidate.id]
+                var newCandidate = this.allCandidates[candidate.id];
+                newCandidate.relevancyScore = (parseFloat(candidate.score) * 100).toFixed(0);
+                newCandidate.skills = candidate.skills;
+                return newCandidate;
             });
             this.setState({candidates: searchedCandidates, isSearching: false});
         }).catch(errors => {
