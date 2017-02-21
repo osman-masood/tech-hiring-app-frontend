@@ -16,6 +16,7 @@ import ReactHighcharts from './highchartsLoader';
 // import HighchartsMore from 'highcharts-more'
 import Header from './Header';
 import {Row, Col, Button, FormControl, ButtonToolbar, FormGroup, ControlLabel, Well, Image} from 'react-bootstrap';
+import CreateCandidateInfoLikeMutation from "../../mutations/CreateCandidateInfoLikeMutation";
 
 const reactjsAdminlte = require('adminlte-reactjs');
 const InfoTile = reactjsAdminlte.InfoTile;
@@ -24,9 +25,6 @@ const ProgressBar = reactjsAdminlte.ProgressBar;
 const StatTile = reactjsAdminlte.StatTile;
 import moment from 'moment';
 
-const getGithubReposUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}?tab=repositories` : null;
-const getGithubOverviewUrl = (githubUsername) => githubUsername ? `https://github.com/${githubUsername}` : null;
-const getHackerRankUrl = (hackerRankUsername) => hackerRankUsername ? `https://www.hackerrank.com/${hackerRankUsername}` : null;
 const getSkillsUrl = candidateId => `https://padawanhire.herokuapp.com/candidates/${candidateId}/skills`;
 
 let commonGraphConfig = {
@@ -88,23 +86,28 @@ class CandidateDetail extends React.Component {
 
     constructor(props) {
         super(props);
+        this.currentUser = JSON.parse(localStorage.getItem('user'));
+
         this.state = {
             isSkillDataLoaded: false,
             errors: [],
-            isLiked: false,
+            isLiked: this.props.user.candidateInfo.likes.edges.map(e => e.node.likerUserId.id === this.currentUser.id).length > 0,
             isArchived: false
         };
         this.candidateSkillsData = [];
         this.candidateJobSkillsData = [];
+        this.onClickLike = this.onClickLike.bind(this);
+        this.onClickArchive = this.onClickArchive.bind(this);
         console.log("CandidateDetail.constructor() called with props", this.props);
     }
 
     onClickLike() {
-
+        createCandidateInfoLike(this.props.user.candidateInfo, this.currentUser);
+        this.setState({isLiked: !this.state.isLiked});
     }
 
     onClickArchive() {
-
+        this.setState({isArchived: !this.state.isArchived});
     }
 
     componentDidMount() {
@@ -216,13 +219,18 @@ class CandidateDetail extends React.Component {
                         <h1>
                             <span>{this.props.user.fullName || this.props.user.username}</span>
                             <small>Joined {joinedDate}</small>
-                            <a className={"btn btn-app" + (this.state.isLiked ? " bg-green" : "")} style={styles.topButtons}>
+                            <a className={"btn btn-app" + (this.state.isLiked ? " bg-green" : "")}
+                               style={styles.topButtons}
+                               onClick={this.onClickLike}>
+
                                 <i className="fa fa-heart-o" />
                                 { this.state.isLiked ? "Liked": "Like" }
                             </a>
-                            <a className={"btn btn-app" + (this.state.isHidden ? " bg-gray" : "")} style={styles.topButtons}>
+                            <a className={"btn btn-app" + (this.state.isArchived ? " bg-gray" : "")}
+                               style={styles.topButtons}
+                               onClick={this.onClickArchive}>
                                 <i className="fa fa-archive"/>
-                                {this.state.isHidden ? "Hidden" : "Don't show"}
+                                {this.state.isArchived ? "Hidden" : "Don't show"}
                             </a>
                             <a className="btn btn-app" style={styles.topButtons}>
                                 <i className="fa fa-phone"/> Call Padawan
@@ -597,9 +605,12 @@ class CandidateDetail extends React.Component {
 }
 
 export default Relay.createContainer(CandidateDetail, {
+    initialVariables: {
+        currentUserId: JSON.parse(localStorage.getItem('user')).id
+    },
     fragments: {
         user: () => Relay.QL`
-            fragment on User {
+            fragment on User @relay(pattern:true) {
                 fullName
                 username
                 thumbnailUrl
@@ -617,7 +628,24 @@ export default Relay.createContainer(CandidateDetail, {
                     modifiedAt
                     createdAt
 
-
+                    likes(first:100) {
+                        edges {
+                            node {
+                                likerUserId {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                    archives(first:100) {
+                        edges {
+                            node {
+                                archiverUserId {
+                                    id
+                                }
+                            }
+                        }
+                    }
                 }
             }`,
         job: () => Relay.QL`
@@ -633,3 +661,23 @@ const styles = {
         marginLeft: "3%"
     }
 };
+
+
+function createCandidateInfoLike(candidateInfo, user) {
+    return new Promise((resolve, reject) => {
+        Relay.Store.commitUpdate(new CreateCandidateInfoLikeMutation({
+            input: {
+                candidateInfo: candidateInfo,
+                user: user  //{id: userId}
+            },
+            candidateInfoLike: null
+        }), {
+            onSuccess: (data) => {
+                resolve(data);
+            },
+            onFailure: (transaction) => {
+                reject(transaction.getError().message);
+            }
+        });
+    });
+}
